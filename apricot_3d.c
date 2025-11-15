@@ -114,7 +114,7 @@ apricot_3d_render_wireframe(const ApricotCanvas *canvas,
   for (int i = 0; i < 12; i++) {
     int a = edges[i][0];
     int b = edges[i][1];
-    apricot_draw_line(canvas, px[a], py[a], px[b], py[b], 1, color);
+    apricot_draw_line(canvas, px[a], py[a], px[b], py[b], color);
   }
 }
 
