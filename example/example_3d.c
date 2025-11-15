@@ -1,0 +1,32 @@
+#define APRICOT_IMPLEMENTATION
+
+#include "../apricot.c"
+#include "../apricot_3d.c"
+
+#include <stdio.h>
+
+int main() {
+  const size_t width = 400, height = 400;
+  uint32_t *pixels = (uint32_t *)malloc(width * height * sizeof(uint32_t));
+  if (!pixels)
+    return 1;
+
+  ApricotCanvas canvas = apricot_canvas(pixels, 400, 400);
+  apricot_clear(&canvas, apricot_color(0, 0, 0, 255));
+
+  ApricotRotation rot = {0.2f, 0.8f, 0.1f};
+  ApricotColor white = apricot_color(255, 255, 255, 255);
+
+  apricot_3d_render_wireframe(&canvas, (Apricot3DVector){200, 200, 0}, 100, 80,
+                              150, rot, APRICOT_RECT_CENTER, white);
+
+  // Save to PPM
+  if (apricot_save_ppm("example/images/output_3d.ppm", &canvas) != 0) {
+    fprintf(stderr, "Failed to save PPM\n");
+  } else {
+    printf("Saved output_3d2.ppm\n");
+  }
+
+  free(pixels);
+  return 0;
+}

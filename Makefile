@@ -1,24 +1,29 @@
 CC = clang
 CFLAGS = -O2 -Wall -I.
 
-EXAMPLE_SRC = example/example.c
-EXAMPLE_BIN = build/example
-IMAGES_DIR = example/images
+EXAMPLES_DIR = example
+BUILD_DIR = build
+IMAGES_DIR = $(EXAMPLES_DIR)/images
 
-# Default target: build and run
-all: run
+# Automatically find all example C files
+EXAMPLE_SRCS := $(wildcard $(EXAMPLES_DIR)/*.c)
+EXAMPLE_BINS := $(patsubst $(EXAMPLES_DIR)/%.c,$(BUILD_DIR)/%,$(EXAMPLE_SRCS))
 
-# Ensure the build directory exists and compile
-$(EXAMPLE_BIN): $(EXAMPLE_SRC) apricot.c
-	mkdir -p build
-	mkdir -p $(IMAGES_DIR)
-	$(CC) $(CFLAGS) $(EXAMPLE_SRC) apricot.c -o $(EXAMPLE_BIN)
+# Ensure directories exist
+$(shell mkdir -p $(BUILD_DIR))
+$(shell mkdir -p $(IMAGES_DIR))
 
-# Run the built program
-run: $(EXAMPLE_BIN)
-	./$(EXAMPLE_BIN)
+# Default target: build and run all examples
+all: $(EXAMPLE_BINS)
+	@for bin in $(EXAMPLE_BINS); do \
+		echo "Running $$bin..."; \
+		./$$bin; \
+	done
+
+# Build each example individually (no linking with other files)
+$(BUILD_DIR)/%: $(EXAMPLES_DIR)/%.c
+	$(CC) $(CFLAGS) $< -o $@ -lm
 
 clean:
-	rm -f $(EXAMPLE_BIN)
-	rm -rf $(IMAGES_DIR)
-	rm -rf build
+	rm -rf $(BUILD_DIR)/*
+	rm -rf $(IMAGES_DIR)/*

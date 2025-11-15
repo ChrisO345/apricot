@@ -1,14 +1,14 @@
 #ifndef APRICOT_C_
 #define APRICOT_C_
 
-#include <stdlib.h>
 #ifndef APRICOTCDEF
-#define APRICOTCDEF static inline
+#define APRICOTCDEF extern
 #endif
 
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define APRICOT_VERSION "0.0.0"
 
@@ -45,6 +45,9 @@ APRICOTCDEF void apricot_fill_rect(const ApricotCanvas *canvas, int x, int y,
                                    int w, int h, ApricotColor color);
 APRICOTCDEF void apricot_fill_circle(const ApricotCanvas *canvas, int cx,
                                      int cy, int radius, ApricotColor color);
+APRICOTCDEF void apricot_fill_ellipse(const ApricotCanvas *canvas, int cx,
+                                      int cy, int rx, int ry,
+                                      ApricotColor color);
 APRICOTCDEF void apricot_fill_triangle(const ApricotCanvas *canvas, int x0,
                                        int y0, int x1, int y1, int x2, int y2,
                                        ApricotColor color);
@@ -60,14 +63,25 @@ APRICOTCDEF void apricot_draw_line(const ApricotCanvas *canvas, int x0, int y0,
 APRICOTCDEF void apricot_draw_circle(const ApricotCanvas *canvas, int cx,
                                      int cy, int radius, int thickness,
                                      ApricotColor color);
+APRICOTCDEF void apricot_draw_ellipse(const ApricotCanvas *canvas, int cx,
+                                      int cy, int rx, int ry, int thickness,
+                                      ApricotColor color);
 APRICOTCDEF void apricot_draw_triangle(const ApricotCanvas *canvas, int x0,
                                        int y0, int x1, int y1, int x2, int y2,
                                        int thickness, ApricotColor color);
+APRICOTCDEF void apricot_draw_polygon(const ApricotCanvas *canvas, int *x,
+                                      int *y, int n, int thickness,
+                                      ApricotColor color);
 
 APRICOTCDEF void apricot_fill_rect_gradient(const ApricotCanvas *canvas, int x,
                                             int y, int w, int h,
                                             ApricotColor c1, ApricotColor c2,
                                             ApricotGradientDirection dir);
+
+// === Color Util ===
+APRICOTCDEF ApricotColor apricot_color_blend(ApricotColor c1, ApricotColor c2,
+                                             float t);
+APRICOTCDEF ApricotColor apricot_color_invert(ApricotColor color);
 
 // === Image Functions ===
 APRICOTCDEF int apricot_save_ppm(const char *filename,
@@ -79,8 +93,7 @@ APRICOTCDEF int apricot_load_bmp(const char *filename, ApricotCanvas *canvas);
 
 #endif /* APRICOT_C_ */
 
-#ifndef APRICOT_IMPLEMENTATION_
-#define APRICOT_IMPLEMENTATION_
+#ifdef APRICOT_IMPLEMENTATION
 
 // === Instantiation ===
 APRICOTCDEF ApricotCanvas apricot_canvas(uint32_t *pixels, size_t width,
@@ -126,9 +139,15 @@ APRICOTCDEF void apricot_fill_rect(const ApricotCanvas *canvas, int x, int y,
 
 APRICOTCDEF void apricot_fill_circle(const ApricotCanvas *canvas, int cx,
                                      int cy, int radius, ApricotColor color) {
-  for (int y = -radius; y <= radius; ++y) {
-    for (int x = -radius; x <= radius; ++x) {
-      if (x * x + y * y <= radius * radius) {
+  apricot_fill_ellipse(canvas, cx, cy, radius, radius, color);
+}
+
+APRICOTCDEF void apricot_fill_ellipse(const ApricotCanvas *canvas, int cx,
+                                      int cy, int rx, int ry,
+                                      ApricotColor color) {
+  for (int y = -ry; y <= ry; ++y) {
+    for (int x = -rx; x <= rx; ++x) {
+      if ((x * x) * (ry * ry) + (y * y) * (rx * rx) <= (rx * rx) * (ry * ry)) {
         int px = cx + x;
         int py = cy + y;
         if (px >= 0 && px < canvas->width && py >= 0 && py < canvas->height) {
@@ -274,19 +293,31 @@ APRICOTCDEF void apricot_draw_line(const ApricotCanvas *canvas, int x0, int y0,
 APRICOTCDEF void apricot_draw_circle(const ApricotCanvas *canvas, int cx,
                                      int cy, int radius, int thickness,
                                      ApricotColor color) {
-  if (radius <= 0 || thickness <= 0)
+  apricot_draw_ellipse(canvas, cx, cy, radius, radius, thickness, color);
+}
+
+APRICOTCDEF void apricot_draw_ellipse(const ApricotCanvas *canvas, int cx,
+                                      int cy, int rx, int ry, int thickness,
+                                      ApricotColor color) {
+  if (rx <= 0 || ry <= 0 || thickness <= 0)
     return;
 
-  int r_outer = radius + thickness / 2;
-  int r_inner = radius - (thickness - 1) / 2;
-  if (r_inner < 0)
-    r_inner = 0;
+  int rx_outer = rx + thickness / 2;
+  int ry_outer = ry + thickness / 2;
+  int rx_inner = rx - (thickness - 1) / 2;
+  int ry_inner = ry - (thickness - 1) / 2;
+  if (rx_inner < 0)
+    rx_inner = 0;
+  if (ry_inner < 0)
+    ry_inner = 0;
 
-  // Iterate bounding square
-  for (int y = -r_outer; y <= r_outer; ++y) {
-    for (int x = -r_outer; x <= r_outer; ++x) {
-      int dist2 = x * x + y * y;
-      if (dist2 >= r_inner * r_inner && dist2 <= r_outer * r_outer) {
+  // Iterate bounding rectangle
+  for (int y = -ry_outer; y <= ry_outer; ++y) {
+    for (int x = -rx_outer; x <= rx_outer; ++x) {
+      int lhs = (x * x) * (ry * ry) + (y * y) * (rx * rx);
+      int rhs_outer = (rx_outer * rx_outer) * (ry_outer * ry_outer);
+      int rhs_inner = (rx_inner * rx_inner) * (ry_inner * ry_inner);
+      if (lhs >= rhs_inner && lhs <= rhs_outer) {
         int px = cx + x;
         int py = cy + y;
         if (px >= 0 && px < canvas->width && py >= 0 && py < canvas->height) {
@@ -303,6 +334,20 @@ APRICOTCDEF void apricot_draw_triangle(const ApricotCanvas *canvas, int x0,
   apricot_draw_line(canvas, x0, y0, x1, y1, thickness, color);
   apricot_draw_line(canvas, x1, y1, x2, y2, thickness, color);
   apricot_draw_line(canvas, x2, y2, x0, y0, thickness, color);
+}
+
+APRICOTCDEF void apricot_draw_polygon(const ApricotCanvas *canvas, int *x,
+                                      int *y, int n, int thickness,
+                                      ApricotColor color) {
+  if (n < 2) {
+    fprintf(stderr, "apricot_draw_polygon: n must be >= 2\n");
+    return;
+  }
+
+  for (int i = 0; i < n; ++i) {
+    int j = (i + 1) % n;
+    apricot_draw_line(canvas, x[i], y[i], x[j], y[j], thickness, color);
+  }
 }
 
 APRICOTCDEF void apricot_fill_rect_gradient(const ApricotCanvas *canvas, int x,
@@ -349,6 +394,24 @@ APRICOTCDEF void apricot_fill_rect_gradient(const ApricotCanvas *canvas, int x,
       canvas->pixels[j * canvas->width + i] = apricot_color(r, g, b, a).value;
     }
   }
+}
+
+// === Color Util ===
+APRICOTCDEF ApricotColor apricot_color_blend(ApricotColor c1, ApricotColor c2,
+                                             float t) {
+  if (t < 0.0f)
+    t = 0.0f;
+  if (t > 1.0f)
+    t = 1.0f;
+  uint8_t r = (uint8_t)((1 - t) * c1.r + t * c2.r);
+  uint8_t g = (uint8_t)((1 - t) * c1.g + t * c2.g);
+  uint8_t b = (uint8_t)((1 - t) * c1.b + t * c2.b);
+  uint8_t a = (uint8_t)((1 - t) * c1.a + t * c2.a);
+  return apricot_color(r, g, b, a);
+}
+
+APRICOTCDEF ApricotColor apricot_color_invert(ApricotColor color) {
+  return apricot_color(255 - color.r, 255 - color.g, 255 - color.b, color.a);
 }
 
 // === Image Functions ===

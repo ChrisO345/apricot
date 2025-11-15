@@ -40,9 +40,6 @@ int main() {
       apricot_color(0, 255, 255, 255), APRICOT_GRADIENT_LEFT_RIGHT);
 
   // Save images
-  if (apricot_save_bmp("example/images/output.bmp", &canvas) != 0) {
-    fprintf(stderr, "Failed to save BMP\n");
-  }
   if (apricot_save_ppm("example/images/output.ppm", &canvas) != 0) {
     fprintf(stderr, "Failed to save PPM\n");
   }
