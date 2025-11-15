@@ -1,8 +1,8 @@
 #ifndef APRICOT_3D_C_
 #define APRICOT_3D_C_
 
-#ifndef APRICOT3DDEF
-#define APRICOT3DDEF extern
+#ifndef APRICOT_3D_DEF
+#define APRICOT_3D_DEF extern
 #endif
 
 typedef struct {
@@ -21,7 +21,7 @@ typedef enum {
   APRICOT_RECT_BOTTOM_LEFT_FRONT
 } Apricot3DRectAnchor;
 
-APRICOT3DDEF void
+APRICOT_3D_DEF void
 apricot_3d_render_wireframe(const ApricotCanvas *canvas,
                             Apricot3DVector reference, float length,
                             float width, float height, ApricotRotation rotation,
@@ -33,7 +33,7 @@ apricot_3d_render_wireframe(const ApricotCanvas *canvas,
 
 #include <math.h>
 
-APRICOT3DDEF void
+APRICOT_3D_DEF void
 apricot_3d_render_wireframe(const ApricotCanvas *canvas,
                             Apricot3DVector reference, float length,
                             float width, float height, ApricotRotation rotation,
