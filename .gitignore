@@ -1,0 +1,17 @@
+# Compiled binaries
+*.o
+*.obj
+*.exe
+*.out
+
+# Build folders
+/build/
+
+# Editor files
+*.swp
+*~
+.idea/
+.vscode/
+
+# Mac OS
+.DS_Store

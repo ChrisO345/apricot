@@ -1,0 +1,52 @@
+#define APRICOT_IMPLEMENTATION
+#include "../apricot.c"
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+  const size_t width = 400, height = 400;
+  uint32_t *pixels = (uint32_t *)malloc(width * height * sizeof(uint32_t));
+  if (!pixels)
+    return 1;
+
+  ApricotCanvas canvas = apricot_canvas(pixels, width, height);
+
+  // Clear canvas
+  apricot_clear(&canvas, apricot_color(0, 0, 0, 255));
+
+  // Draw filled rectangle
+  apricot_fill_rect(&canvas, 50, 50, 100, 80, apricot_color(255, 0, 0, 255));
+  apricot_draw_rect(&canvas, 50, 50, 100, 80, 3, apricot_color(0, 0, 0, 255));
+
+  // Draw filled circle
+  apricot_fill_circle(&canvas, 200, 100, 50, apricot_color(0, 255, 0, 255));
+  apricot_draw_circle(&canvas, 200, 100, 50, 3, apricot_color(0, 0, 0, 255));
+
+  // Draw triangle
+  apricot_fill_triangle(&canvas, 50, 200, 150, 200, 100, 300,
+                        apricot_color(0, 0, 255, 255));
+  apricot_draw_triangle(&canvas, 50, 200, 150, 200, 100, 300, 3,
+                        apricot_color(0, 0, 0, 255));
+
+  // Draw polygon (pentagon)
+  int px[] = {250, 300, 350, 325, 275};
+  int py[] = {200, 210, 250, 300, 300};
+  apricot_fill_polygon(&canvas, px, py, 5, apricot_color(255, 165, 0, 255));
+
+  // Draw rectangle gradient
+  apricot_fill_rect_gradient(
+      &canvas, 50, 320, 300, 60, apricot_color(255, 0, 255, 255),
+      apricot_color(0, 255, 255, 255), APRICOT_GRADIENT_LEFT_RIGHT);
+
+  // Save images
+  if (apricot_save_bmp("example/images/output.bmp", &canvas) != 0) {
+    fprintf(stderr, "Failed to save BMP\n");
+  }
+  if (apricot_save_ppm("example/images/output.ppm", &canvas) != 0) {
+    fprintf(stderr, "Failed to save PPM\n");
+  }
+
+  free(pixels);
+  return 0;
+}
