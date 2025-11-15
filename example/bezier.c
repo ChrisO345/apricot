@@ -42,7 +42,5 @@ int main() {
 
   apricot_save_bmp("example/images/bezier_splines.bmp", &canvas);
   free(pixels);
-
-  printf("Drawn Bezier and spline shapes with line styles!\n");
   return 0;
 }

@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 
 #define APRICOT_IMPLEMENTATION
@@ -29,6 +28,5 @@ int main() {
 
   apricot_save_bmp("example/images/draw_shapes.bmp", &canvas);
   free(pixels);
-  printf("Drawn shapes with line styles!\n");
   return 0;
 }

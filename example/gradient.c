@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 
 #define APRICOT_IMPLEMENTATION
@@ -20,6 +19,5 @@ int main() {
 
   apricot_save_bmp("example/images/gradient.bmp", &canvas);
   free(pixels);
-  printf("Gradient rectangles drawn!\n");
   return 0;
 }

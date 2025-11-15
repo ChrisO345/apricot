@@ -35,8 +35,6 @@ int main() {
   // Save to PPM
   if (apricot_save_ppm("example/images/output_3d.ppm", &canvas) != 0) {
     fprintf(stderr, "Failed to save PPM\n");
-  } else {
-    printf("Saved output_3d2.ppm\n");
   }
 
   free(pixels);

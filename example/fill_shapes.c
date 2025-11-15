@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 
 #define APRICOT_ENABLE_ALPHA_BLENDING
@@ -24,6 +23,5 @@ int main() {
 
   apricot_save_bmp("example/images/fill_shapes.bmp", &canvas);
   free(pixels);
-  printf("Filled shapes drawn!\n");
   return 0;
 }
