@@ -5,6 +5,19 @@
 #define APRICOT_BEZIER_DEF extern
 #endif
 
+// === Arcs ===
+APRICOT_BEZIER_DEF void apricot_fill_arc(const ApricotCanvas *canvas, int cx,
+                                         int cy, int radius, float start_angle,
+                                         float end_angle, ApricotColor color);
+
+APRICOT_BEZIER_DEF void apricot_draw_arc(const ApricotCanvas *canvas, int cx,
+                                         int cy, int radius, float start_angle,
+                                         float end_angle, ApricotColor color);
+APRICOT_BEZIER_DEF void apricot_draw_slice(const ApricotCanvas *canvas, int cx,
+                                           int cy, int radius,
+                                           float start_angle, float end_angle,
+                                           ApricotColor color);
+
 // === Beziers ====
 APRICOT_BEZIER_DEF void
 apricot_draw_quadratic_bezier(const ApricotCanvas *canvas, int x0, int y0,
@@ -35,6 +48,75 @@ APRICOT_BEZIER_DEF void apricot_draw_cubic_spline(const ApricotCanvas *canvas,
 
 #ifdef APRICOT_IMPLEMENTATION
 
+#include <math.h>
+
+// === Arcs ===
+APRICOT_BEZIER_DEF void apricot_fill_arc(const ApricotCanvas *canvas, int cx,
+                                         int cy, int radius, float start_angle,
+                                         float end_angle, ApricotColor color) {
+  if (radius <= 0)
+    return;
+  if (start_angle > end_angle) {
+    float temp = start_angle;
+    start_angle = end_angle;
+    end_angle = temp;
+  }
+  for (int y = -radius; y <= radius; y++) {
+    for (int x = -radius; x <= radius; x++) {
+      if (x * x + y * y <= radius * radius) {
+        float angle = atan2f((float)y, (float)x);
+        if (angle < 0)
+          angle += 2.0f * 3.14159265358979323846f;
+        if (angle >= start_angle && angle <= end_angle) {
+          int px = cx + x;
+          int py = cy + y;
+          if (px >= 0 && px < canvas->width && py >= 0 && py < canvas->height) {
+            APRICOT_SET_PIXEL(canvas, px, py, color);
+          }
+        }
+      }
+    }
+  }
+}
+
+APRICOT_BEZIER_DEF void apricot_draw_arc(const ApricotCanvas *canvas, int cx,
+                                         int cy, int radius, float start_angle,
+                                         float end_angle, ApricotColor color) {
+  if (radius <= 0)
+    return;
+  int segments = (int)(radius * fabsf(end_angle - start_angle) / 4.0f);
+  if (segments < 1)
+    segments = 1;
+  int prev_x = cx + (int)(radius * cosf(start_angle) + 0.5f);
+  int prev_y = cy + (int)(radius * sinf(start_angle) + 0.5f);
+
+  for (int i = 1; i <= segments; i++) {
+    float t = (float)i / segments;
+    float angle = start_angle + t * (end_angle - start_angle);
+    int x = cx + (int)(radius * cosf(angle) + 0.5f);
+    int y = cy + (int)(radius * sinf(angle) + 0.5f);
+    apricot_draw_line(canvas, prev_x, prev_y, x, y, color);
+    prev_x = x;
+    prev_y = y;
+  }
+}
+
+APRICOT_BEZIER_DEF void apricot_draw_slice(const ApricotCanvas *canvas, int cx,
+                                           int cy, int radius,
+                                           float start_angle, float end_angle,
+                                           ApricotColor color) {
+  if (radius <= 0)
+    return;
+  apricot_draw_arc(canvas, cx, cy, radius, start_angle, end_angle, color);
+  int x_start = cx + (int)(radius * cosf(start_angle) + 0.5f);
+  int y_start = cy + (int)(radius * sinf(start_angle) + 0.5f);
+  int x_end = cx + (int)(radius * cosf(end_angle) + 0.5f);
+  int y_end = cy + (int)(radius * sinf(end_angle) + 0.5f);
+  apricot_draw_line(canvas, cx, cy, x_start, y_start, color);
+  apricot_draw_line(canvas, cx, cy, x_end, y_end, color);
+}
+
+// === Beziers ====
 APRICOT_BEZIER_DEF void
 apricot_draw_quadratic_bezier(const ApricotCanvas *canvas, int x0, int y0,
                               int x1, int y1, int x2, int y2,
