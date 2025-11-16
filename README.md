@@ -106,7 +106,8 @@ int main() {
 
   free(pixels);
   return 0;
-}```
+}
+```
 
 Other examples can be found in the [examples](example/) folder.
 

@@ -33,7 +33,7 @@ int main() {
                               70, rot, APRICOT_RECT_BOTTOM_LEFT_FRONT, green);
 
   // Save to PPM
-  if (apricot_save_ppm("example/images/output_3d.ppm", &canvas) != 0) {
+  if (apricot_save_ppm("example/images/3d.ppm", &canvas) != 0) {
     fprintf(stderr, "Failed to save PPM\n");
   }
 
