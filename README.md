@@ -20,7 +20,7 @@ Copy the sources into your project and include them:
 
 ```c
 #define APRICOT_IMPLEMENTATION
-#include "apricot.c"
+#include "apricot.h"
 ```
 
 ---
@@ -28,17 +28,17 @@ Copy the sources into your project and include them:
 ## Extensions
 
 Apricot supports optional extensions for additional functionality.
-* **apricot_3d.c**: Basic 3D rendering capabilities *WIP*.
-* **apricot_bezier.c**: Bezier curve drawing.
-* **apricot_rotation.c**: Rendering with rotation transformations. *WIP*.
-* **apricot_ttf.c**: Basic text rendering using bitmap fonts.
+* **apricot_3d.h**: Basic 3D rendering capabilities *WIP*.
+* **apricot_bezier.h**: Bezier curve drawing.
+* **apricot_rotation.h**: Rendering with rotation transformations. *WIP*.
+* **apricot_ttf.h**: Basic text rendering using bitmap fonts.
 
 To use an extension, include its source file after including `apricot.c`:
 
 ```c
 #define APRICOT_IMPLEMENTATION
-#include "apricot.c"
-#include "apricot_bezier.c"
+#include "apricot.h"
+#include "apricot_bezier.h"
 ```
 
 ---
@@ -50,7 +50,7 @@ To use an extension, include its source file after including `apricot.c`:
 #include <stdlib.h>
 
 #define APRICOT_IMPLEMENTATION
-#include "../apricot.c"
+#include "../apricot.h"
 
 int main() {
   const int w = 400, h = 300;

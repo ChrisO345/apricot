@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #define APRICOT_IMPLEMENTATION
-#include "../apricot.c"
+#include "../apricot.h"
 
 int main() {
   const int w = 300, h = 200;

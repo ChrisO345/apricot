@@ -1,7 +1,3 @@
-#define APRICOT_IMPLEMENTATION
-#define APRICOT_ENABLE_DEFAULT_ROTATION
-#include "apricot.c"
-
 #ifndef APRICOT_ROT_C_
 #define APRICOT_ROT_C_
 

@@ -2,8 +2,8 @@
 #include <stdlib.h>
 
 #define APRICOT_IMPLEMENTATION
-#include "../apricot.c"
-#include "../apricot_ttf.c"
+#include "../apricot.h"
+#include "../apricot_ttf.h"
 
 int main() {
   const int w = 400, h = 300;

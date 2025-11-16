@@ -1,7 +1,7 @@
 #define APRICOT_IMPLEMENTATION
 
-#include "../apricot.c"
-#include "../apricot_3d.c"
+#include "../apricot.h"
+#include "../apricot_3d.h"
 
 #include <stdio.h>
 
